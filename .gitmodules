@@ -1,0 +1,9 @@
+[submodule "asserv"]
+	path = asserv
+	url = https://github.com/furobalex/asserv
+[submodule "paf"]
+	path = paf
+	url = https://github.com/furobalex/paf
+[submodule "marteau"]
+	path = marteau
+	url = https://github.com/furobalex/marteau
