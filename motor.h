@@ -5,11 +5,13 @@
 */
 
 #ifndef MOTEUR
+#define MOTEUR
 
-  #define MOTEUR
-  
-    #define SPEED 100
-    #define PIN_CREMAILLERE 3  // chiffre correspondant au pin M4
+#define PIN_BUTEE_DEPLIE 52
+#define PIN_BUTEE_PLIE 53
+
+#define SPEED 100
+#define PIN_CREMAILLERE 3  // chiffre correspondant au pin M4
     
     void avancerCremaillere();
     void reculerCremaillere();
