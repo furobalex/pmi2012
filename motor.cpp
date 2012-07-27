@@ -31,10 +31,10 @@ void Stop()
 void initialisation()
 {
     moteur.setSpeed(SPEED);
-    pinMode(A1, INPUT);
-    digitalWrite(A1, HIGH);
-    pinMode(A5, INPUT);
-    digitalWrite(A5, HIGH);// pull up sur pin 2
+    pinMode(52, INPUT);
+    digitalWrite(52, HIGH);
+    pinMode(53, INPUT);
+    digitalWrite(53, HIGH);// pull up sur pin 2
     Serial.begin(9600);
     Serial.println("bonjour");
 }
@@ -51,7 +51,7 @@ bool paf()
     break;
     
     case 1:
-    if(digitalRead(A1)==LOW)
+    if(digitalRead(52)==LOW)
     {
       etat=2;
       Stop();
@@ -64,7 +64,7 @@ bool paf()
     break;
     
     case 3:
-    if(digitalRead(A5)== LOW)
+    if(digitalRead(53)== LOW)
     { 
       etat=0;
       Stop();
