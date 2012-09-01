@@ -1,6 +1,12 @@
-# Arduino 0018 Makefile
-# Arduino adaptation by mellis, eighthave, oli.keller, 
-# Path for MacOSX and for libraries added by guyzmo{at}hackable-devices.org
+# Arduino 1.0 Makefile
+# Based on Arduino 0018 Makefile
+# last updated 12/15/2011, Kerry Wong
+#
+# Arduino adaptation by mellis, eighthave, oli.keller
+#
+# Modified by Kerry Wong to support NetBeans
+# http://www.kerrywong.com
+#
 #
 # This makefile allows you to build sketches from the command line
 # without the Arduino environment (or Java).
@@ -35,68 +41,65 @@
 #
 # $Id$
 
-# Global arduino installation configuration
-
-# 1. User libraries path configuration
-LOCAL_LIB_DIR = $(CURDIR)/lib
-
-# for every library you need to use, please add the path to the .cpp file here
-LOCAL_CXX = \
-#$(LOCAL_LIB_DIR)/Sure0832/Sure0832.cpp \
-#$(LOCAL_LIB_DIR)/EthernetDHCP/EthernetDHCP.cpp
-
-LOCAL_C = 
-#$(LOCAL_LIB_DIR)/EthernetDHCP/utility/EthernetDhcpUtil.c
-
-# 2. arduino configuration
+TARGET = $(notdir $(CURDIR))
+# Change this to match your arduino installation directory
+INSTALL_DIR = /C/arduino-1.0.1
+PORT = COM5
 UPLOAD_RATE = 57600
 AVRDUDE_PROGRAMMER = stk500v1
-#MCU = atmega168
 MCU = atmega2560
 F_CPU = 16000000
-VERSION=18
-PORT = COM*
-#PORT = /dev/tty.usbserial-A800eIR3
 
-# 3. global library path configuration
-TARGET = $(notdir $(CURDIR))
-INSTALL_DIR = C:\Program Files\Arduino\arduino-1.0.1
-INSTALL_LIB_DIR = $(INSTALL_DIR)/libraries
-
-############################################################################
-# Below here nothing should be changed...
-
+VERSION=100
 ARDUINO = $(INSTALL_DIR)/hardware/arduino/cores/arduino
+VARIANTS = $(INSTALL_DIR)/hardware/arduino/variants/standard
+ARDUINO_LIB = $(INSTALL_DIR)/libraries
 AVR_TOOLS_PATH = $(INSTALL_DIR)/hardware/tools/avr/bin
-#AVR_TOOLS_PATH = /usr/bin
 AVRDUDE_PATH = $(INSTALL_DIR)/hardware/tools/avr/bin
-ARD_C=$(shell find $(INSTALL_LIB_DIR)/*/ $(LOCAL_LIB_DIR)/*/ | grep '\.c\$$' | tr '\n' ' ')
+
+#Note that if your program has dependencies other than those
+#already listed below, you will need to add them accordingly.
 C_MODULES =  \
 $(ARDUINO)/wiring_pulse.c \
 $(ARDUINO)/wiring_analog.c \
-$(ARDUINO)/pins_arduino.c \
 $(ARDUINO)/wiring.c \
 $(ARDUINO)/wiring_digital.c \
 $(ARDUINO)/WInterrupts.c \
 $(ARDUINO)/wiring_shift.c \
-$(LOCAL_C)
-# end of C_MODULES
 
 CXX_MODULES = \
 $(ARDUINO)/Tone.cpp \
-$(ARDUINO)/main.cpp \
 $(ARDUINO)/WMath.cpp \
 $(ARDUINO)/Print.cpp \
 $(ARDUINO)/HardwareSerial.cpp \
-$(LOCAL_CXX)
-# end of CXX_MODULES
+$(ARDUINO)/CDC.cpp \
+$(ARDUINO)/HID.cpp \
+$(ARDUINO)/IPAddress.cpp \
+$(ARDUINO)/new.cpp \
+$(ARDUINO)/Stream.cpp \
+$(ARDUINO)/USBCore.cpp \
+$(ARDUINO)/WString.cpp \
+$(ARDUINO)/main.cpp \
+$(ARDUINO_LIB)/EEPROM/EEPROM.cpp \
+$(CURDIR)/marteau/Servo.cpp \
+$(CURDIR)/marteau/fonctions.cpp \
+$(CURDIR)/asserv/AFMotor.cpp \
+$(CURDIR)/asserv/command.cpp \
+$(CURDIR)/asserv/control.cpp \
+$(CURDIR)/asserv/encoder.cpp \
+$(CURDIR)/asserv/fifo.cpp \
+$(CURDIR)/asserv/message.cpp \
+$(CURDIR)/asserv/PID_Beta6.cpp \
+$(CURDIR)/asserv/pwm.cpp \
+$(CURDIR)/asserv/robotstate.cpp \
+$(CURDIR)/paf/motor.cpp \
+$(CURDIR)/paf/AFMotor.cpp \
 
-CXX_APP = applet/$(TARGET).cpp
+CXX_APP = main.cpp
 MODULES = $(C_MODULES) $(CXX_MODULES)
 SRC = $(C_MODULES)
 CXXSRC = $(CXX_MODULES) $(CXX_APP)
 FORMAT = ihex
-
 
 # Name of this Makefile (used for "make depend").
 MAKEFILE = Makefile
@@ -114,9 +117,8 @@ CDEFS = -DF_CPU=$(F_CPU)L -DARDUINO=$(VERSION)
 CXXDEFS = -DF_CPU=$(F_CPU)L -DARDUINO=$(VERSION)
 
 # Place -I options here
-ARD_LIB=$(shell find $(INSTALL_LIB_DIR)/*/ $(LOCAL_LIB_DIR)/*/ -type d | tr '\n' ' ' | sed -e 's, /, -I/,g')
-CINCS = -I$(ARDUINO) -I $(ARD_LIB) -I./
-CXXINCS = -I$(ARDUINO) -I $(ARD_LIB) -I./
+CINCS = -I$(ARDUINO)  -I$(VARIANTS) -I$(ARDUINO_LIB)
+CXXINCS = -I$(ARDUINO) -I$(VARIANTS) -I$(ARDUINO_LIB)
 
 # Compiler flag to set the C Standard level.
 # c89   - "ANSI" C
@@ -127,7 +129,7 @@ CXXINCS = -I$(ARDUINO) -I $(ARD_LIB) -I./
 CDEBUG = -g$(DEBUG)
 #CWARN = -Wall -Wstrict-prototypes
 #CWARN = -Wall   # show all warnings
-CWARN = -w      # suppress all warnings
+CWARN = -w #suppress all warnings
 ####CTUNING = -funsigned-char -funsigned-bitfields -fpack-struct -fshort-enums
 CTUNING = -ffunction-sections -fdata-sections
 CXXTUNING = -fno-exceptions -ffunction-sections -fdata-sections
@@ -136,18 +138,16 @@ CXXTUNING = -fno-exceptions -ffunction-sections -fdata-sections
 CFLAGS = $(CDEBUG) -O$(OPT) $(CWARN) $(CTUNING) $(CDEFS) $(CINCS) $(CSTANDARD) $(CEXTRA)
 CXXFLAGS = $(CDEBUG) -O$(OPT) $(CWARN) $(CXXTUNING) $(CDEFS) $(CINCS)
 #ASFLAGS = -Wa,-adhlns=$(<:.S=.lst),-gstabs
-LDFLAGS = -O$(OPT) -lm -Wl,--gc-sections
+LDFLAGS = -O$(OPT) -Wl,--gc-sections -mmodel
 
 
 # Programming support using avrdude. Settings and variables.
 AVRDUDE_PORT = $(PORT)
-AVRDUDE_WRITE_FLASH = -U flash:w:applet/$(TARGET).hex
+AVRDUDE_WRITE_FLASH = -U flash:w:applet/main.hex
 
-#AVRDUDE_FLAGS = -V -F -C $(INSTALL_DIR)/hardware/tools/avr/etc/avrdude.conf \
-
-AVRDUDE_FLAGS = -V -F -C $(INSTALL_DIR)/hardware/tools/avr/etc/avrdude.conf \
+AVRDUDE_FLAGS = -V -F -C $(INSTALL_DIR)/hardware/tools/avrdude.conf \
 -p $(MCU) -P $(AVRDUDE_PORT) -c $(AVRDUDE_PROGRAMMER) \
--b $(UPLOAD_RATE)
+-b $(UPLOAD_RATE) -D
 
 # Program settings
 CC = $(AVR_TOOLS_PATH)/avr-gcc
@@ -181,40 +181,28 @@ all: applet_files build sizeafter
 
 build: elf hex
 
-#applet_files: $(TARGET).pde
-applet/$(TARGET).cpp: $(TARGET).pde
-	# Here is the "preprocessing".
-	# It creates a .cpp file based with the same name as the .pde file.
-	# On top of the new .cpp file comes the WProgram.h header.
-	# and prototypes for setup() and Loop()
-	# Then the .cpp file will be compiled. Errors during compile will
-	# refer to this new, automatically generated, file.
-	# Not the original .pde file you actually edit...
+applet/main.o: 
 	test -d applet || mkdir applet
-	echo '#include "WProgram.h"' > applet/$(TARGET).cpp
-	echo 'void setup();' >> applet/$(TARGET).cpp
-	echo 'void loop();' >> applet/$(TARGET).cpp
-	cat $(TARGET).pde >> applet/$(TARGET).cpp
+	$(CXX) -c $(ALL_CXXFLAGS) main.cpp -o applet/main.o
 
-elf: applet/$(TARGET).elf
-hex: applet/$(TARGET).hex
-eep: applet/$(TARGET).eep
-lss: applet/$(TARGET).lss
-sym: applet/$(TARGET).sym
+elf: applet/main.elf
+hex: applet/main.hex
+eep: applet/main.eep
+lss: applet/main.lss
+sym: applet/main.sym
 
-# Program the device.  
-upload: applet/$(TARGET).hex
+# Program the device.
+upload: applet/main.hex
 	$(AVRDUDE) $(AVRDUDE_FLAGS) $(AVRDUDE_WRITE_FLASH)
 
-
 	# Display size of file.
-HEXSIZE = $(SIZE) --target=$(FORMAT) applet/$(TARGET).hex
-ELFSIZE = $(SIZE)  applet/$(TARGET).elf
+HEXSIZE = $(SIZE) --target=$(FORMAT) applet/main.hex
+ELFSIZE = $(SIZE)  applet/main.elf
 sizebefore:
-	@if [ -f applet/$(TARGET).elf ]; then echo; echo $(MSG_SIZE_BEFORE); $(HEXSIZE); echo; fi
+	@if [ -f applet/main.elf ]; then echo; echo $(MSG_SIZE_BEFORE); $(HEXSIZE); echo; fi
 
 sizeafter:
-	@if [ -f applet/$(TARGET).elf ]; then echo; echo $(MSG_SIZE_AFTER); $(HEXSIZE); echo; fi
+	@if [ -f applet/main.elf ]; then echo; echo $(MSG_SIZE_AFTER); $(HEXSIZE); echo; fi
 
 
 # Convert ELF to COFF for use in debugging / simulating in AVR Studio or VMLAB.
@@ -225,12 +213,12 @@ COFFCONVERT=$(OBJCOPY) --debugging \
 --change-section-address .eeprom-0x810000
 
 
-coff: applet/$(TARGET).elf
-	$(COFFCONVERT) -O coff-avr applet/$(TARGET).elf $(TARGET).cof
+coff: applet/main.elf
+	$(COFFCONVERT) -O coff-avr applet/main.elf main.cof
 
 
-extcoff: $(TARGET).elf
-	$(COFFCONVERT) -O coff-ext-avr applet/$(TARGET).elf $(TARGET).cof
+extcoff: main.elf
+	$(COFFCONVERT) -O coff-ext-avr applet/main.elf main.cof
 
 
 .SUFFIXES: .elf .hex .eep .lss .sym
@@ -251,14 +239,13 @@ extcoff: $(TARGET).elf
 .elf.sym:
 	$(NM) -n $< > $@
 
-	# Link: create ELF output file from library.
+# Link: create ELF output file from library.
 #applet/$(TARGET).elf: $(TARGET).pde applet/core.a
-applet/$(TARGET).elf: applet/$(TARGET).o applet/core.a
-	$(LD) $(ALL_LDFLAGS) -o $@ applet/$(TARGET).o applet/core.a
+applet/main.elf: applet/main.o applet/core.a
+	$(LD) $(ALL_LDFLAGS) -o $@ applet/main.o applet/core.a -lm
 
 applet/core.a: $(OBJ_MODULES)
 	@for i in $(OBJ_MODULES); do echo $(AR) rcs applet/core.a $$i; $(AR) rcs applet/core.a $$i; done
-
 
 
 # Compile: create object files from C++ source files.
@@ -290,12 +277,11 @@ applet/core.a: $(OBJ_MODULES)
 
 # Target: clean project.
 clean:
-	$(REMOVE) applet/$(TARGET).hex applet/$(TARGET).eep applet/$(TARGET).cof applet/$(TARGET).elf \
-	applet/$(TARGET).map applet/$(TARGET).sym applet/$(TARGET).lss applet/core.a \
+	$(REMOVE) applet/main.hex applet/main.eep applet/main.cof applet/main.elf \
+	applet/main.map applet/main.sym applet/main.o applet/main.lss applet/core.a \
 	$(OBJ) $(LST) $(SRC:.c=.s) $(SRC:.c=.d) $(CXXSRC:.cpp=.s) $(CXXSRC:.cpp=.d)
 
 .PHONY:	all build elf hex eep lss sym program coff extcoff clean applet_files sizebefore sizeafter
 
 #include $(SRC:.c=.d)
-#include $(CXXSRC:.cpp=.d) 
-
+#include $(CXXSRC:.cpp=.d)

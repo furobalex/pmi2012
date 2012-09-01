@@ -1,16 +1,16 @@
 #include "include_arduino.h"
 
 
-#include "parameters.h"
+#include "asserv/parameters.h"
 #include <math.h>
 
-#include "encoder.h"
-#include "robotstate.h"
-#include "pwm.h"
-#include "fifo.h"
-#include "message.h"
-#include "control.h"
-#include "motor.h"
+#include "asserv/encoder.h"
+#include "asserv/robotstate.h"
+#include "asserv/pwm.h"
+#include "asserv/fifo.h"
+#include "asserv/message.h"
+#include "asserv/control.h"
+#include "paf/motor.h"
 #include "define.h"
 
 unsigned long index = 0;
