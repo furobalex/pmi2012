@@ -45,8 +45,8 @@ TARGET = $(notdir $(CURDIR))
 # Change this to match your arduino installation directory
 INSTALL_DIR = /C/arduino-1.0.1
 PORT = COM5
-UPLOAD_RATE = 57600
-AVRDUDE_PROGRAMMER = stk500v1
+UPLOAD_RATE = 115200
+AVRDUDE_PROGRAMMER = stk500v2
 MCU = atmega2560
 F_CPU = 16000000
 
@@ -145,7 +145,7 @@ LDFLAGS = -O$(OPT) -Wl,--gc-sections -mmodel
 AVRDUDE_PORT = $(PORT)
 AVRDUDE_WRITE_FLASH = -U flash:w:applet/main.hex
 
-AVRDUDE_FLAGS = -V -F -C $(INSTALL_DIR)/hardware/tools/avrdude.conf \
+AVRDUDE_FLAGS = -V -F -C $(INSTALL_DIR)/hardware/tools/avr/etc/avrdude.conf \
 -p $(MCU) -P $(AVRDUDE_PORT) -c $(AVRDUDE_PROGRAMMER) \
 -b $(UPLOAD_RATE) -D
 
