@@ -82,7 +82,7 @@ $(ARDUINO)/WString.cpp \
 $(ARDUINO)/main.cpp \
 $(ARDUINO_LIB)/EEPROM/EEPROM.cpp \
 $(CURDIR)/marteau/Servo.cpp \
-$(CURDIR)/marteau/fonctions.cpp \
+$(CURDIR)/marteau/marteau.cpp \
 $(CURDIR)/asserv/AFMotor.cpp \
 $(CURDIR)/asserv/command.cpp \
 $(CURDIR)/asserv/control.cpp \
